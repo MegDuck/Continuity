@@ -1,5 +1,11 @@
 package me.pepperbell.continuity.client;
 
+import me.pepperbell.continuity.client.processor.*;
+import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.world.biome.Biome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,10 +14,6 @@ import me.pepperbell.continuity.api.client.CtmLoader;
 import me.pepperbell.continuity.api.client.CtmLoaderRegistry;
 import me.pepperbell.continuity.api.client.CtmProperties;
 import me.pepperbell.continuity.api.client.QuadProcessor;
-import me.pepperbell.continuity.client.processor.BaseCachingPredicates;
-import me.pepperbell.continuity.client.processor.CompactCtmQuadProcessor;
-import me.pepperbell.continuity.client.processor.ProcessingDataKeys;
-import me.pepperbell.continuity.client.processor.TopQuadProcessor;
 import me.pepperbell.continuity.client.processor.overlay.SimpleOverlayQuadProcessor;
 import me.pepperbell.continuity.client.processor.overlay.StandardOverlayQuadProcessor;
 import me.pepperbell.continuity.client.processor.simple.CtmSpriteProvider;
@@ -49,12 +51,21 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ContinuityClient implements ClientModInitializer {
+	public static final RegistryKey<Biome> CRYSTAL_HOLLOWS = RegistryKey.of(RegistryKeys.BIOME, Identifier.of("skyblock", "crystal_hollows"));
+	public static final RegistryKey<Biome> MINING_THREE = RegistryKey.of(RegistryKeys.BIOME, Identifier.of("skyblock", "mining_3"));
+
 	public static final String ID = "continuity";
 	public static final String NAME = "Continuity";
 	public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
+	public static String currentHypixelBiome = null;
 
 	@Override
 	public void onInitializeClient() {
+		HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
+		HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, packet -> {
+			if(packet.getMode().isEmpty()) currentHypixelBiome = null;
+			else currentHypixelBiome = packet.getMode().get();
+		});
 		ProcessingDataKeyRegistryImpl.INSTANCE.init();
 		BiomeHolderManager.init();
 		ProcessingDataKeys.init();

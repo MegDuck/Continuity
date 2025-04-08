@@ -1,5 +1,6 @@
 package me.pepperbell.continuity.client.processor.overlay;
 
+import java.util.BitSet;
 import java.util.EnumSet;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
@@ -19,8 +20,8 @@ import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
 
 public class OverlayProcessingPredicate extends BaseProcessingPredicate {
-	public OverlayProcessingPredicate(@Nullable EnumSet<Direction> faces, @Nullable Predicate<Biome> biomePredicate, @Nullable IntPredicate heightPredicate, @Nullable Predicate<String> blockEntityNamePredicate) {
-		super(faces, biomePredicate, heightPredicate, blockEntityNamePredicate);
+	public OverlayProcessingPredicate(@Nullable EnumSet<Direction> faces, @Nullable Predicate<Biome> biomePredicate, @Nullable IntPredicate heightPredicate, @Nullable Predicate<String> blockEntityNamePredicate, BitSet hypixelBiomes) {
+		super(faces, biomePredicate, heightPredicate, blockEntityNamePredicate, hypixelBiomes);
 	}
 
 	@Override
@@ -32,6 +33,6 @@ public class OverlayProcessingPredicate extends BaseProcessingPredicate {
 	}
 
 	public static OverlayProcessingPredicate fromProperties(BaseCtmProperties properties) {
-		return new OverlayProcessingPredicate(properties.getFaces(), properties.getBiomePredicate(), properties.getHeightPredicate(), properties.getBlockEntityNamePredicate());
+		return new OverlayProcessingPredicate(properties.getFaces(), properties.getBiomePredicate(), properties.getHeightPredicate(), properties.getBlockEntityNamePredicate(), properties.getHypixelBiomes());
 	}
 }

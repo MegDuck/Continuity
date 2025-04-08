@@ -1,0 +1,11 @@
+{
+  "carvers": [],
+  "creature_spawn_probability": 0.03,
+  "downfall": 0.0,
+  "effects": {},
+  "features": [],
+  "has_precipitation": false,
+  "spawn_costs": {},
+  "spawners": {},
+  "temperature": 2.0
+}

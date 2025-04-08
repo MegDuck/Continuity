@@ -1,18 +1,13 @@
 package me.pepperbell.continuity.client.properties;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,8 +66,9 @@ public class BaseCtmProperties implements CtmProperties {
 	protected IntPredicate heightPredicate;
 	@Nullable
 	protected Predicate<String> blockEntityNamePredicate;
-
 	protected boolean prioritized = false;
+	protected BitSet hypixelBiomes = new BitSet(4);
+
 
 	protected boolean valid = true;
 	protected Set<SpriteIdentifier> textureDependencies;
@@ -353,8 +349,18 @@ public class BaseCtmProperties implements CtmProperties {
 					}
 
 					try {
-						Identifier biomeId = Identifier.of(biomeStr.toLowerCase(Locale.ROOT));
-						biomeHolderSet.add(BiomeHolderManager.getOrCreateHolder(biomeId));
+						if(biomeStr.equals("NeuCrystalHollowsJungle") || biomeStr.equals("NeuCrystalHollowsMithrilDeposits") || biomeStr.equals("NeuCrystalHollowsPrecursorRemnants") || biomeStr.equals("NeuCrystalHollowsGoblinHoldout") || biomeStr.equals("NeuCrystalHollowsMagmaFields") || biomeStr.equals("NeuCrystalHollowsCrystalNucleus")) {
+							hypixelBiomes.set(0);
+						} else if(biomeStr.equals("NeuGlaciteTunnels")) {
+							hypixelBiomes.set(1);
+						} else if(biomeStr.equals("NeuGlaciteMineshaft")) {
+							hypixelBiomes.set(2);
+						} else if(biomeStr.equals("DwarvenMines")) {
+							hypixelBiomes.set(3);
+						} else {
+							Identifier biomeId = Identifier.of(biomeStr.toLowerCase(Locale.ROOT));
+							biomeHolderSet.add(BiomeHolderManager.getOrCreateHolder(biomeId));
+						}
 					} catch (InvalidIdentifierException e) {
 						ContinuityClient.LOGGER.warn("Invalid 'biomes' element '" + biomeStr + "' at index " + i + " in file '" + resourceId + "' in pack '" + packId + "'", e);
 					}
@@ -367,7 +373,7 @@ public class BaseCtmProperties implements CtmProperties {
 						biomePredicate = biomePredicate.negate();
 					}
 				} else {
-					if (!negate) {
+					if (!negate && hypixelBiomes.isEmpty()) {
 						valid = false;
 					}
 				}
@@ -666,6 +672,8 @@ public class BaseCtmProperties implements CtmProperties {
 	public Identifier getResourceId() {
 		return resourceId;
 	}
+
+	public BitSet getHypixelBiomes() { return hypixelBiomes; }
 
 	public String getPackId() {
 		return packId;

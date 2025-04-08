@@ -1,6 +1,8 @@
 package me.pepperbell.continuity.client.processor;
 
+import java.util.BitSet;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
@@ -19,6 +21,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
 
+import static me.pepperbell.continuity.client.ContinuityClient.LOGGER;
+import static me.pepperbell.continuity.client.ContinuityClient.currentHypixelBiome;
+
 public class BaseProcessingPredicate implements ProcessingPredicate {
 	@Nullable
 	protected EnumSet<Direction> faces;
@@ -28,12 +33,15 @@ public class BaseProcessingPredicate implements ProcessingPredicate {
 	protected IntPredicate heightPredicate;
 	@Nullable
 	protected Predicate<String> blockEntityNamePredicate;
+	protected BitSet hypixelBiomes;
 
-	public BaseProcessingPredicate(@Nullable EnumSet<Direction> faces, @Nullable Predicate<Biome> biomePredicate, @Nullable IntPredicate heightPredicate, @Nullable Predicate<String> blockEntityNamePredicate) {
+
+	public BaseProcessingPredicate(@Nullable EnumSet<Direction> faces, @Nullable Predicate<Biome> biomePredicate, @Nullable IntPredicate heightPredicate, @Nullable Predicate<String> blockEntityNamePredicate, BitSet hypixelBiomes) {
 		this.faces = faces;
 		this.biomePredicate = biomePredicate;
 		this.heightPredicate = heightPredicate;
 		this.blockEntityNamePredicate = blockEntityNamePredicate;
+		this.hypixelBiomes = hypixelBiomes;
 	}
 
 	@Override
@@ -59,7 +67,17 @@ public class BaseProcessingPredicate implements ProcessingPredicate {
 		}
 		if (biomePredicate != null) {
 			Biome biome = dataProvider.getData(ProcessingDataKeys.BIOME_CACHE).get(blockView, pos);
+
 			if (biome == null || !biomePredicate.test(biome)) {
+				return false;
+			}
+		}
+		if(!hypixelBiomes.isEmpty()) {
+			if(currentHypixelBiome == null) return false;
+			if(!(hypixelBiomes.get(0) && currentHypixelBiome.equals("crystal_hollows") ||
+			hypixelBiomes.get(1) && currentHypixelBiome.equals("glacite_tunnels") ||
+			hypixelBiomes.get(2) && currentHypixelBiome.equals("glacite_mineshaft") ||
+			hypixelBiomes.get(3) && currentHypixelBiome.equals("mining_3"))) {
 				return false;
 			}
 		}
@@ -73,7 +91,7 @@ public class BaseProcessingPredicate implements ProcessingPredicate {
 	}
 
 	public static BaseProcessingPredicate fromProperties(BaseCtmProperties properties) {
-		return new BaseProcessingPredicate(properties.getFaces(), properties.getBiomePredicate(), properties.getHeightPredicate(), properties.getBlockEntityNamePredicate());
+		return new BaseProcessingPredicate(properties.getFaces(), properties.getBiomePredicate(), properties.getHeightPredicate(), properties.getBlockEntityNamePredicate(), properties.getHypixelBiomes());
 	}
 
 	public static class BiomeCache {

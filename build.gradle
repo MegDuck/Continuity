@@ -31,6 +31,16 @@ repositories {
 		name 'Shedaniel'
 		url 'https://maven.shedaniel.me'
 	}
+	maven {
+		name = "Devauth"
+		url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1"
+	}
+	maven {
+		name = "Hypixel"
+		url 'https://repo.hypixel.net/repository/Hypixel/'
+	}
+
+
 }
 
 dependencies {
@@ -38,6 +48,8 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation 'net.hypixel:mod-api:1.0.1'
+
 
 	// Fabric API
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
@@ -45,6 +57,7 @@ dependencies {
 	modImplementation("com.terraformersmc:modmenu:${modmenu_version}") {
 		exclude group: 'net.fabricmc.fabric-api'
 	}
+	modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 }
 
 processResources {
